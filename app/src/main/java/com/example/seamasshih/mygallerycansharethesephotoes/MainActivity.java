@@ -52,8 +52,6 @@ public class MainActivity extends AppCompatActivity{
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(MainActivity.this,new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},READ_REQUESTCODE);
 
-
-
 //        manager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         manager = new GridLayoutManager(this,2, OrientationHelper.VERTICAL,false);
         adapter = new MyAdapter(this,getData());
