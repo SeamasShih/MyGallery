@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.seamasshih.mygallerycansharethesephotoes.Data.MyPhotoData;
 import com.example.seamasshih.mygallerycansharethesephotoes.R;
 
@@ -46,8 +47,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     public void onBindViewHolder(final ViewHolder holder, int position) {
         MyImageView item = holder.itemView;
 
+        RequestOptions requestOptions = new RequestOptions().centerCrop();
         Glide.with(context)
                 .load(mData.get(position).getData())
+                .apply(requestOptions)
                 .into(item);
 
         item.setOnClickListener(new View.OnClickListener() {
