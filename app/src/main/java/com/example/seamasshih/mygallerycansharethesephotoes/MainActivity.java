@@ -1,6 +1,7 @@
 package com.example.seamasshih.mygallerycansharethesephotoes;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -20,6 +21,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -39,11 +41,12 @@ public class MainActivity extends AppCompatActivity{
     RecyclerView recyclerView;
     MyAdapter adapter;
     GridLayoutManager manager;
-    GestureDetectorCompat gestureDetector;
+    ScaleGestureDetector detector;
 
     final int READ_REQUESTCODE = 5566;
     boolean inSrollDown = false;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +55,6 @@ public class MainActivity extends AppCompatActivity{
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(MainActivity.this,new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},READ_REQUESTCODE);
 
-//        manager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         manager = new GridLayoutManager(this,2, OrientationHelper.VERTICAL,false);
         adapter = new MyAdapter(this,getData());
 
@@ -68,10 +70,37 @@ public class MainActivity extends AppCompatActivity{
         recyclerView.addItemDecoration(new MyItemDecoration(this, LinearLayout.HORIZONTAL));
 
 
-//        int height = getMaxHeight();
-//        lp = (LinearLayout.LayoutParams) view.getLayoutParams();
-//        lp.setMargins(0,(int)(deltaDistance*height),0,0);
-//        view.setLayoutParams(lp);
+        detector = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+
+            boolean canScale = true;
+
+            @Override
+            public boolean onScale(ScaleGestureDetector detector) {
+                float factor = detector.getScaleFactor();
+                if (canScale && factor != 1) {
+                    manager.setSpanCount(factor > 1 ? Math.min(manager.getSpanCount() + 1, 6) : Math.max(manager.getSpanCount() - 1, 1));
+                    canScale = false;
+                }
+                return super.onScale(detector);
+            }
+
+            @Override
+            public void onScaleEnd(ScaleGestureDetector detector) {
+                canScale = true;
+                super.onScaleEnd(detector);
+            }
+        });
+
+        recyclerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getPointerCount() == 2) {
+                    detector.onTouchEvent(event);
+                    return true;
+                }
+                return false;
+            }
+        });
 
         adapter.setOnItemListener(new MyAdapter.OnItemClickListener() {
             @Override
