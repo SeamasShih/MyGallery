@@ -2,6 +2,8 @@ package com.example.seamasshih.mygallerycansharethesephotoes;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -17,6 +19,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.LinearLayout;
 
 import com.example.seamasshih.mygallerycansharethesephotoes.Data.MyPhotoData;
@@ -32,9 +36,11 @@ public class MainActivity extends AppCompatActivity{
     MyAdapter adapter;
     GridLayoutManager manager;
     ScaleGestureDetector detector;
+    SharedPreferences sharedPreferences;
+    final String SHARED_PREFERENCE_NAME = "mSharePreference";
+    final String SHARED_PREFERENCE_SPAN_COUNT = "mSpanCount";
 
     final int READ_REQUESTCODE = 5566;
-    boolean inSrollDown = false;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -45,7 +51,10 @@ public class MainActivity extends AppCompatActivity{
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(MainActivity.this,new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},READ_REQUESTCODE);
 
-        manager = new GridLayoutManager(this,2, OrientationHelper.VERTICAL,false);
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCE_NAME,MODE_PRIVATE);
+        int mSpanCount = sharedPreferences.getInt(SHARED_PREFERENCE_SPAN_COUNT,3);
+
+        manager = new GridLayoutManager(this,mSpanCount, OrientationHelper.VERTICAL,false);
         adapter = new MyAdapter(this,getData());
 
         recyclerView = findViewById(R.id.recyclerView);
@@ -68,7 +77,7 @@ public class MainActivity extends AppCompatActivity{
             public boolean onScale(ScaleGestureDetector detector) {
                 float factor = detector.getScaleFactor();
                 if (canScale && factor != 1) {
-                    manager.setSpanCount(factor > 1 ? Math.min(manager.getSpanCount() + 1, 6) : Math.max(manager.getSpanCount() - 1, 1));
+                    manager.setSpanCount(factor < 1 ? Math.min(manager.getSpanCount() + 1, 6) : Math.max(manager.getSpanCount() - 1, 1));
                     canScale = false;
                 }
                 return super.onScale(detector);
@@ -96,6 +105,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onItemClick(View view, int position) {
                 Log.d("Seamas","onItemClick");
+
             }
 
             @Override
@@ -103,6 +113,49 @@ public class MainActivity extends AppCompatActivity{
                 Log.d("Seamas","onItemLongClick");
             }
         });
+
+    }
+
+    @Override
+    protected void onStop() {
+        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(SHARED_PREFERENCE_SPAN_COUNT,manager.getSpanCount());
+        editor.apply();
+        super.onStop();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Context context = recyclerView.getContext();
+        LayoutAnimationController controller;
+        switch (manager.getSpanCount()){
+            case 1:
+                controller = AnimationUtils.loadLayoutAnimation(context,R.anim.layout_fall_down_1);
+                break;
+            case 2:
+                controller = AnimationUtils.loadLayoutAnimation(context,R.anim.layout_fall_down_2);
+                break;
+            case 3:
+                controller = AnimationUtils.loadLayoutAnimation(context,R.anim.layout_fall_down_3);
+                break;
+            case 4:
+                controller = AnimationUtils.loadLayoutAnimation(context,R.anim.layout_fall_down_4);
+                break;
+            case 5:
+                controller = AnimationUtils.loadLayoutAnimation(context,R.anim.layout_fall_down_5);
+                break;
+            case 6:
+                controller = AnimationUtils.loadLayoutAnimation(context,R.anim.layout_fall_down_6);
+                break;
+            default:
+                controller = AnimationUtils.loadLayoutAnimation(context,R.anim.layout_fall_down_6);
+                break;
+        }
+        recyclerView.setLayoutAnimation(controller);
+        recyclerView.getAdapter().notifyDataSetChanged();
+        recyclerView.scheduleLayoutAnimation();
     }
 
     @Override

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <integer name="animation_dur_6">150</integer>
+    <integer name="animation_dur_5">200</integer>
+    <integer name="animation_dur_4">300</integer>
+    <integer name="animation_dur_3">425</integer>
+    <integer name="animation_dur_2">600</integer>
+    <integer name="animation_dur_1">800</integer>
+
+</resources>
