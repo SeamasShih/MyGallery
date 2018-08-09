@@ -1,4 +1,4 @@
-package com.example.seamasshih.mygallerycansharethesephotoes.RecycleView;
+package com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

@@ -1,16 +1,13 @@
-package com.example.seamasshih.mygallerycansharethesephotoes.RecycleView;
+package com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v4.view.NestedScrollingParent;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
-import android.view.animation.Animation;
 import android.widget.LinearLayout;
 
 public class MyNestedScrollingView extends LinearLayout implements NestedScrollingParent {

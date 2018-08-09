@@ -2,37 +2,27 @@ package com.example.seamasshih.mygallerycansharethesephotoes;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.ContentResolver;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.example.seamasshih.mygallerycansharethesephotoes.Data.MyPhotoData;
-import com.example.seamasshih.mygallerycansharethesephotoes.RecycleView.MyAdapter;
-import com.example.seamasshih.mygallerycansharethesephotoes.RecycleView.MyEdgeEffect;
-import com.example.seamasshih.mygallerycansharethesephotoes.RecycleView.MyEdgeEffectFactory;
-import com.example.seamasshih.mygallerycansharethesephotoes.RecycleView.MyItemDecoration;
-import com.example.seamasshih.mygallerycansharethesephotoes.RecycleView.MyOnFlingListener;
-import com.example.seamasshih.mygallerycansharethesephotoes.RecycleView.MyOnScrollListener;
+import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyAdapter;
+import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyEdgeEffectFactory;
+import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyItemDecoration;
 
 import java.util.ArrayList;
 

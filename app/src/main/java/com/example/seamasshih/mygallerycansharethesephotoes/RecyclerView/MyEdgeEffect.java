@@ -1,9 +1,7 @@
-package com.example.seamasshih.mygallerycansharethesephotoes.RecycleView;
+package com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView;
 
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.util.Log;
 import android.widget.EdgeEffect;
 
 public class MyEdgeEffect extends EdgeEffect {
