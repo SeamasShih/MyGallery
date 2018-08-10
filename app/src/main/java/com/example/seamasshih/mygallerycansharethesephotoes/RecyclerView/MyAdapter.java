@@ -1,9 +1,13 @@
 package com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -17,16 +21,19 @@ import java.util.ArrayList;
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     private ArrayList<MyPhotoData> mData;
-    private MyAdapter.OnItemClickListener listener;
     private Context context;
+    private ArrayList<Integer> pick;
 
-    public MyAdapter(Context context , ArrayList<MyPhotoData> data){
+    public MyAdapter(Context context){
         this.context = context;
-        mData = data;
+        mData = new ArrayList<>();
+        pick = new ArrayList<>();
     }
 
-    public void upDateData(ArrayList<MyPhotoData> data){
+    public void updateData(ArrayList<MyPhotoData> data){
+        mData.clear();
         mData = data;
+        pick.clear();
         notifyDataSetChanged();
     }
 
@@ -39,13 +46,15 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         return new ViewHolder(v);
     }
 
-    public void setOnItemListener(MyAdapter.OnItemClickListener listener){
-        this.listener = listener;
-    }
 
-
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    @SuppressLint("ClickableViewAccessibility")
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
         MyImageView item = holder.itemView;
+        item.setPicked(false);
+
+        if (pick.contains(position)) {
+            item.setPicked(true);
+        }
 
         RequestOptions requestOptions = new RequestOptions().centerCrop();
         Glide.with(context)
@@ -56,9 +65,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (listener != null){
-                    int pos = holder.getLayoutPosition();
-                    listener.onItemClick(holder.itemView,pos);
+                if (getPickCount() == 0){
+
+                }
+                else {
+                    setImagePick((MyImageView)v, position);
                 }
             }
         });
@@ -66,18 +77,49 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         item.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if (listener != null){
-                    int pos = holder.getLayoutPosition();
-                    listener.onItemLongClick(holder.itemView,pos);
-                }
+                setImagePick((MyImageView) v,position);
                 return true;
             }
         });
+        item.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        ((MyImageView)v).setColorFilter(Color.argb(80,255,0,0));
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        break;
+                    default:
+                        ((MyImageView)v).clearColorFilter();
+                        break;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void setImagePick(MyImageView view, int pos){
+        view.clearColorFilter();
+        if (pick.contains(pos)){
+            view.setPicked(false);
+            pick.remove(pick.indexOf(pos));
+            view.invalidate();
+        }
+        else {
+            view.setPicked(true);
+            pick.add(pos);
+            view.invalidate();
+        }
     }
 
     @Override
     public int getItemCount() {
         return mData == null ? 0 : mData.size();
+    }
+
+    public int getPickCount(){
+        return pick == null ? 0 : pick.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -88,11 +130,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             super(view);
             itemView = view.findViewById(R.id.item_iv);
         }
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(View view, int position);
-        void onItemLongClick(View view, int position);
     }
 
 }

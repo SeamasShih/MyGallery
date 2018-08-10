@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -15,10 +16,10 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.LinearLayout;
@@ -26,6 +27,7 @@ import android.widget.LinearLayout;
 import com.example.seamasshih.mygallerycansharethesephotoes.Data.MyPhotoData;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyAdapter;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyEdgeEffectFactory;
+import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyImageView;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyItemDecoration;
 
 import java.util.ArrayList;
@@ -47,15 +49,16 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(MainActivity.this,new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},READ_REQUESTCODE);
 
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCE_NAME,MODE_PRIVATE);
-        int mSpanCount = sharedPreferences.getInt(SHARED_PREFERENCE_SPAN_COUNT,3);
+        final int mSpanCount = sharedPreferences.getInt(SHARED_PREFERENCE_SPAN_COUNT,3);
 
         manager = new GridLayoutManager(this,mSpanCount, OrientationHelper.VERTICAL,false);
-        adapter = new MyAdapter(this,getData());
+        adapter = new MyAdapter(this);
 
         recyclerView = findViewById(R.id.recyclerView);
         // 设置布局管理器
@@ -100,20 +103,12 @@ public class MainActivity extends AppCompatActivity{
                 return false;
             }
         });
+    }
 
-        adapter.setOnItemListener(new MyAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                Log.d("Seamas","onItemClick");
-
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-                Log.d("Seamas","onItemLongClick");
-            }
-        });
-
+    @Override
+    protected void onResume() {
+        adapter.updateData(getData());
+        super.onResume();
     }
 
     @Override
@@ -126,8 +121,7 @@ public class MainActivity extends AppCompatActivity{
 
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
         Context context = recyclerView.getContext();
         LayoutAnimationController controller;
         switch (manager.getSpanCount()){
@@ -156,6 +150,7 @@ public class MainActivity extends AppCompatActivity{
         recyclerView.setLayoutAnimation(controller);
         recyclerView.getAdapter().notifyDataSetChanged();
         recyclerView.scheduleLayoutAnimation();
+        super.onStart();
     }
 
     @Override
