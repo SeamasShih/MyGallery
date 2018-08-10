@@ -106,6 +106,14 @@ public class MainActivity extends AppCompatActivity{
     }
 
     @Override
+    public void onBackPressed() {
+        if (adapter.getPickCount() == 0)
+            super.onBackPressed();
+        else
+            adapter.cancelImagePick();
+    }
+
+    @Override
     protected void onResume() {
         adapter.updateData(getData());
         super.onResume();

@@ -113,6 +113,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         }
     }
 
+    public void cancelImagePick(){
+        pick.clear();
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return mData == null ? 0 : mData.size();
