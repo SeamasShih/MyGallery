@@ -3,14 +3,16 @@ package com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.view.NestedScrollingParent;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
-public class MyNestedScrollingView extends LinearLayout implements NestedScrollingParent {
+public class MyNestedScrollingView extends RelativeLayout implements NestedScrollingParent {
 
     RecyclerView recyclerView;
     View topView;

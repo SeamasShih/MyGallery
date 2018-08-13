@@ -13,5 +13,16 @@
         android:layout_height="match_parent"
         android:scrollbars="vertical"/>
 
+    <com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyFloatingActionMenu
+        android:id="@+id/fabMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp">
+
+    </com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyFloatingActionMenu>
+
+
 
 </com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyNestedScrollingView>

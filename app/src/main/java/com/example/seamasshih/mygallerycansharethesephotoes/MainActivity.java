@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -16,6 +15,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -27,13 +27,15 @@ import android.widget.LinearLayout;
 import com.example.seamasshih.mygallerycansharethesephotoes.Data.MyPhotoData;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyAdapter;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyEdgeEffectFactory;
-import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyImageView;
+import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyFloatingActionButton;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyItemDecoration;
+import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity{
 
+    FloatingActionMenu floatingActionMenu;
     RecyclerView recyclerView;
     MyAdapter adapter;
     GridLayoutManager manager;
@@ -80,7 +82,14 @@ public class MainActivity extends AppCompatActivity{
             public boolean onScale(ScaleGestureDetector detector) {
                 float factor = detector.getScaleFactor();
                 if (canScale && factor != 1) {
-                    manager.setSpanCount(factor < 1 ? Math.min(manager.getSpanCount() + 1, 6) : Math.max(manager.getSpanCount() - 1, 1));
+                    if (factor < 1 && manager.getSpanCount() != 6) {
+                        manager.setSpanCount(manager.getSpanCount() + 1);
+                        adapter.notifyItemChanged(0); // It can perform an animation but I don't know why...
+                    }
+                    else if (factor > 1 && manager.getSpanCount() != 1){
+                        manager.setSpanCount(manager.getSpanCount() - 1);
+                        adapter.notifyItemChanged(0); // It can perform an animation but I don't know why...
+                    }
                     canScale = false;
                 }
                 return super.onScale(detector);
