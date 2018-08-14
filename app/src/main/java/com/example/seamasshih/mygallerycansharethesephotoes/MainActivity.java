@@ -27,7 +27,6 @@ import android.widget.LinearLayout;
 import com.example.seamasshih.mygallerycansharethesephotoes.Data.MyPhotoData;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyAdapter;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyEdgeEffectFactory;
-import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyFloatingActionButton;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyItemDecoration;
 import com.github.clans.fab.FloatingActionMenu;
 
@@ -139,6 +138,7 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onStart() {
+        Log.d("Seamas","onStart");
         Context context = recyclerView.getContext();
         LayoutAnimationController controller;
         switch (manager.getSpanCount()){
@@ -187,6 +187,7 @@ public class MainActivity extends AppCompatActivity{
         String[] projections = {
                 MediaStore.Images.Media.DATA,
                 MediaStore.Images.Media.DISPLAY_NAME,
+                MediaStore.Images.Media.MIME_TYPE,
                 MediaStore.Images.Media.WIDTH,
                 MediaStore.Images.Media.HEIGHT
         };

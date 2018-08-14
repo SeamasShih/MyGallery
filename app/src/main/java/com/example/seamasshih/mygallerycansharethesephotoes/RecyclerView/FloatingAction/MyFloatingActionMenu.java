@@ -1,4 +1,4 @@
-package com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView;
+package com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.FloatingAction;
 
 import android.animation.ValueAnimator;
 import android.content.Context;

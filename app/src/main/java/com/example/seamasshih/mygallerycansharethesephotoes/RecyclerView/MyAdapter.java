@@ -2,8 +2,10 @@ package com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.seamasshih.mygallerycansharethesephotoes.Data.MyPhotoData;
+import com.example.seamasshih.mygallerycansharethesephotoes.PhotoActivity;
 import com.example.seamasshih.mygallerycansharethesephotoes.R;
 
 import java.util.ArrayList;
@@ -66,7 +69,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 if (getPickCount() == 0){
-
+                    Intent intent = new Intent();
+                    intent.setClass(context, PhotoActivity.class);
+                    intent.putExtra("photoOrder",position+1);
+                    intent.putExtra("photoAmount",getItemCount());
+                    intent.putExtra("photoData",mData.get(position));
+                    context.startActivity(intent);
                 }
                 else {
                     setImagePick((MyImageView)v, position);
