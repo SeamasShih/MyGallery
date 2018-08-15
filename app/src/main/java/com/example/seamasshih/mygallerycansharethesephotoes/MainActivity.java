@@ -3,19 +3,25 @@ package com.example.seamasshih.mygallerycansharethesephotoes;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -28,24 +34,27 @@ import com.example.seamasshih.mygallerycansharethesephotoes.Data.MyPhotoData;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyAdapter;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyEdgeEffectFactory;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyItemDecoration;
+import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyNestedScrollingView;
 import com.github.clans.fab.FloatingActionMenu;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity{
 
-    FloatingActionMenu floatingActionMenu;
+    Toolbar toolbar;
     RecyclerView recyclerView;
+    MyNestedScrollingView scrollingView;
     MyAdapter adapter;
     GridLayoutManager manager;
     ScaleGestureDetector detector;
     SharedPreferences sharedPreferences;
+    MyContentObserver contentObserver;
     final String SHARED_PREFERENCE_NAME = "mSharePreference";
     final String SHARED_PREFERENCE_SPAN_COUNT = "mSpanCount";
 
     final int READ_REQUESTCODE = 5566;
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,24 +64,81 @@ public class MainActivity extends AppCompatActivity{
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(MainActivity.this,new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},READ_REQUESTCODE);
 
+        findMyView();
+
+        setToolbar();
+
+        setRecyclerView();
+
+        setListener();
+
+        registerContentObserver();
+    }
+
+    private void registerContentObserver() {
+        contentObserver = new MyContentObserver(new Handler());
+        getContentResolver().registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,true,contentObserver);
+    }
+
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        scrollingView.setToolbarY(toolbar.getHeight());
+    }
+
+    void findMyView(){
+        recyclerView = findViewById(R.id.recyclerView);
+        toolbar = findViewById(R.id.tool);
+        scrollingView = findViewById(R.id.scrollingLayout);
+    }
+
+
+    private void setToolbar() {
+        toolbar.inflateMenu(R.menu.widget);
+        toolbar.setVisibility(View.INVISIBLE);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+        toolbar.setOnMenuItemClickListener(new MyMenuItemClickListener(this));
+    }
+
+    public boolean isToolbarVisible(){
+        return toolbar.isShown();
+    }
+
+    public void showToolbar(boolean show){
+        toolbar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        if (!show){
+            scrollingView.onStopNestedScroll(recyclerView);
+        }
+    }
+
+
+    void setRecyclerView(){
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCE_NAME,MODE_PRIVATE);
         final int mSpanCount = sharedPreferences.getInt(SHARED_PREFERENCE_SPAN_COUNT,3);
 
         manager = new GridLayoutManager(this,mSpanCount, OrientationHelper.VERTICAL,false);
-        adapter = new MyAdapter(this);
+        adapter = new MyAdapter(this,getData());
 
-        recyclerView = findViewById(R.id.recyclerView);
-        // 设置布局管理器
         recyclerView.setLayoutManager(manager);
-        // 设置adapter
+
         recyclerView.setAdapter(adapter);
 
         recyclerView.setEdgeEffectFactory(new MyEdgeEffectFactory());
 
         recyclerView.addItemDecoration(new MyItemDecoration(this, LinearLayout.VERTICAL));
         recyclerView.addItemDecoration(new MyItemDecoration(this, LinearLayout.HORIZONTAL));
+    }
 
 
+
+    @SuppressLint("ClickableViewAccessibility")
+    void setListener(){
         detector = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
 
             boolean canScale = true;
@@ -113,32 +179,37 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
+
     @Override
     public void onBackPressed() {
         if (adapter.getPickCount() == 0)
             super.onBackPressed();
-        else
+        else {
             adapter.cancelImagePick();
+            showToolbar(false);
+        }
     }
 
+
     @Override
-    protected void onResume() {
-        adapter.updateData(getData());
-        super.onResume();
+    protected void onDestroy() {
+        super.onDestroy();
+        getContentResolver().unregisterContentObserver(contentObserver);
     }
 
     @Override
     protected void onStop() {
+        super.onStop();
         @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(SHARED_PREFERENCE_SPAN_COUNT,manager.getSpanCount());
         editor.apply();
-        super.onStop();
     }
 
 
     @Override
     protected void onStart() {
-        Log.d("Seamas","onStart");
+        super.onStart();
+        showToolbar(false);
         Context context = recyclerView.getContext();
         LayoutAnimationController controller;
         switch (manager.getSpanCount()){
@@ -167,7 +238,6 @@ public class MainActivity extends AppCompatActivity{
         recyclerView.setLayoutAnimation(controller);
         recyclerView.getAdapter().notifyDataSetChanged();
         recyclerView.scheduleLayoutAnimation();
-        super.onStart();
     }
 
     @Override
@@ -213,4 +283,79 @@ public class MainActivity extends AppCompatActivity{
 
         return data;
     }
+
+    class MyMenuItemClickListener implements Toolbar.OnMenuItemClickListener{
+
+        Context context;
+
+        public MyMenuItemClickListener(Context context){
+            this.context = context;
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            switch (item.getItemId()){
+                case R.id.tool_share:
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+                    ArrayList<MyPhotoData> shareData = adapter.getPhotoData();
+                    ArrayList<Integer> sharePick = adapter.getPick();
+                    ArrayList<Uri> sendUriList = new ArrayList<>();
+
+                    File sharePath;
+                    for (int p : sharePick){
+                        sharePath = new File(shareData.get(p).getData());
+                        Uri uri = FileProvider.getUriForFile(
+                                context,BuildConfig.APPLICATION_ID + ".your_name",sharePath);
+                        sendUriList.add(uri);
+                    }
+
+                    String mimeType = shareData.get(0).getMimeType();
+                    shareIntent.setType(mimeType);
+                    shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM,sendUriList);
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivity(Intent.createChooser(shareIntent,"Share "+mimeType));
+                    break;
+                case R.id.tool_delete:
+                    ArrayList<MyPhotoData> deleteData = adapter.getPhotoData();
+                    ArrayList<Integer> deletePick = adapter.getPick();
+//                    ArrayList<String> deleteList = new ArrayList<>();
+
+                    for (int p : deletePick){
+                        File file = new File(deleteData.get(p).getData());
+//                        deleteList.add(file.getPath());
+                        String[] strings =new String[]{file.getPath()};
+                        context.getContentResolver().delete(
+                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,MediaStore.Images.Media.DATA + "=?", strings
+                        );
+                    }
+
+//                    String[] strings = deleteList.toArray(new String[deleteList.size()]);
+//                    context.getContentResolver().delete(
+//                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,MediaStore.Images.Media.DATA + "=?", strings
+//                    );
+                    showToolbar(false);
+                    break;
+            }
+            return true;
+        }
+    }
+
+    class MyContentObserver extends ContentObserver{
+
+        /**
+         * Creates a content observer.
+         *
+         * @param handler The handler to run {@link #onChange} on, or null if none.
+         */
+        public MyContentObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+            adapter.updateData(getData());
+        }
+    }
+
 }

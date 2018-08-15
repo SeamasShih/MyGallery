@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.seamasshih.mygallerycansharethesephotoes.Data.MyPhotoData;
+import com.example.seamasshih.mygallerycansharethesephotoes.MainActivity;
 import com.example.seamasshih.mygallerycansharethesephotoes.PhotoActivity;
 import com.example.seamasshih.mygallerycansharethesephotoes.R;
 
@@ -27,10 +28,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private Context context;
     private ArrayList<Integer> pick;
 
-    public MyAdapter(Context context){
+    public MyAdapter(Context context,ArrayList<MyPhotoData> data){
         this.context = context;
         mData = new ArrayList<>();
         pick = new ArrayList<>();
+        mData = data;
     }
 
     public void updateData(ArrayList<MyPhotoData> data){
@@ -38,6 +40,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         mData = data;
         pick.clear();
         notifyDataSetChanged();
+    }
+
+    public ArrayList<MyPhotoData> getPhotoData() {
+        return mData;
+    }
+
+    public ArrayList<Integer> getPick() {
+        return pick;
     }
 
     @NonNull
@@ -119,6 +129,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             pick.add(pos);
             view.invalidate();
         }
+        if (getPickCount() == 0){
+            ((MainActivity)context).showToolbar(false);
+        }else
+            ((MainActivity)context).showToolbar(true);
     }
 
     public void cancelImagePick(){

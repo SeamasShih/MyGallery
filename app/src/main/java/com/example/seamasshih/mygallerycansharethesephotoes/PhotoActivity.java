@@ -57,6 +57,7 @@ public class PhotoActivity extends AppCompatActivity {
     ObjectAnimator photoAnimatorX;
     ObjectAnimator photoAnimatorY;
     AnimatorSet photoAnimatorSet;
+    final long CANCEL_TIME = 800;
     final int WRITE_REQUESTCODE = 6655;
 
     @Override
@@ -84,11 +85,11 @@ public class PhotoActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
+        super.onStart();
         Window window = getWindow();
         WindowManager.LayoutParams windowParams = window.getAttributes();
         windowParams.alpha = 1f;
         window.setAttributes(windowParams);
-        super.onStart();
     }
 
 
@@ -149,7 +150,7 @@ public class PhotoActivity extends AppCompatActivity {
                         break;
                     case MotionEvent.ACTION_UP:
                         if (readyFinish)
-                            finish();
+                            doPhotoBackAnimation(0);
                         break;
                 }
                 return false;
@@ -177,9 +178,9 @@ public class PhotoActivity extends AppCompatActivity {
 
 
     void initialPhotoAnimator(){
-        photoAnimatorX = ObjectAnimator.ofFloat(photo,"rotationX",0,7.07f,10,7.07f,0,-7.07f,-10,-7.07f,0).setDuration(1000);
+        photoAnimatorX = ObjectAnimator.ofFloat(photo,"rotationX",0,7.07f,10,7.07f,0,-7.07f,-10,-7.07f,0).setDuration(CANCEL_TIME);
         photoAnimatorX.setRepeatCount(ValueAnimator.INFINITE);
-        photoAnimatorY = ObjectAnimator.ofFloat(photo,"rotationY",10,7.07f,0,-7.07f,-10,-7.07f,0,7.07f,10).setDuration(1000);
+        photoAnimatorY = ObjectAnimator.ofFloat(photo,"rotationY",10,7.07f,0,-7.07f,-10,-7.07f,0,7.07f,10).setDuration(CANCEL_TIME);
         photoAnimatorY.setRepeatCount(ValueAnimator.INFINITE);
 
         photoAnimatorSet = new AnimatorSet();
@@ -195,10 +196,18 @@ public class PhotoActivity extends AppCompatActivity {
                 float t = (float) animation.getAnimatedValue();
                 photo.setScaleX(t);
                 photo.setScaleY(t);
+                if (t == 0)
+                    finish();
             }
         });
     }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        doPhotoBackAnimation(0);
+    }
 
     class MyMenuItemClickListener implements Toolbar.OnMenuItemClickListener{
 
@@ -228,6 +237,7 @@ public class PhotoActivity extends AppCompatActivity {
                     context.getContentResolver().delete(
                             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,MediaStore.Images.Media.DATA + "=?", strings
                     );
+                    doPhotoBackAnimation(0);
                     finish();
                     break;
             }

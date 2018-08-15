@@ -1,28 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyNestedScrollingView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/relativeLayout">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyNestedScrollingView
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"/>
+        android:orientation="vertical"
+        tools:context=".MainActivity"
+        android:id="@+id/scrollingLayout">
 
-    <com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.FloatingAction.MyFloatingActionMenu
-        android:id="@+id/fabMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="16dp">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"/>
 
-    </com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.FloatingAction.MyFloatingActionMenu>
+    </com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyNestedScrollingView>
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/tool"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        app:titleTextColor="@android:color/white"
+        app:navigationIcon="?android:attr/homeAsUpIndicator"
+        android:background="#70000000">
 
+    </android.support.v7.widget.Toolbar>
 
-</com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyNestedScrollingView>
+</RelativeLayout>
