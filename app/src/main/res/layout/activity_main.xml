@@ -25,6 +25,7 @@
         android:id="@+id/tool"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
+        android:layout_alignParentBottom="true"
         app:titleTextColor="@android:color/white"
         app:navigationIcon="?android:attr/homeAsUpIndicator"
         android:background="#70000000">

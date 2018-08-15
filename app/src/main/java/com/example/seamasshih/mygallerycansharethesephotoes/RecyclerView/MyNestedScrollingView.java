@@ -58,7 +58,7 @@ public class MyNestedScrollingView extends RelativeLayout implements NestedScrol
 
     @Override
     public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
-        return (!child.canScrollVertically(-1) && !isAnimation);
+        return ((!child.canScrollVertically(-1)||!child.canScrollVertically(1)) && !isAnimation);
     }
 
     @Override
@@ -76,19 +76,44 @@ public class MyNestedScrollingView extends RelativeLayout implements NestedScrol
             }
             scrollBy(0, dy);
             consumed[1] = dy;
+        }else if (!target.canScrollVertically(1)){
+            mDY += dy;
+            Log.d("Seamas","dy = " + dy);
+            if (mDY < 0) {
+                mDY = 0;
+                scrollTo(0, 0);
+                return;
+            } else if (mDY > toolbarY) {
+                scrollTo(0, toolbarY);
+                mDY = toolbarY;
+                return;
+            }
+            scrollBy(0, dy);
+            consumed[1] = dy;
         }
     }
 
     @Override
     public void onStopNestedScroll(View child) {
-        if (!((MainActivity)getContext()).isToolbarVisible() && mDY != 0) {
-            backToNormalStatus();
+        if (mDY < 0)
+            upToNormalStatus();
+        if (!((MainActivity)getContext()).isToolbarVisible() && mDY > 0) {
+            downToNormalStatus();
         }
     }
 
-    public void backToNormalStatus(){
+    public void upToNormalStatus(){
         isAnimation = true;
         float rate = (float) -mDY / (float)toolbarY;
+        long time = (long) (400*rate);
+        animator.setIntValues(mDY, 0);
+        animator.setDuration(time);
+        animator.start();
+    }
+
+    public void downToNormalStatus(){
+        isAnimation = true;
+        float rate = (float) mDY / (float)toolbarY;
         long time = (long) (400*rate);
         animator.setIntValues(mDY, 0);
         animator.setDuration(time);
