@@ -6,7 +6,7 @@
     android:background="@android:color/transparent"
     android:id="@+id/myPhotoLayout">
 
-    <ImageView
+    <com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyPhotoView
         android:id="@+id/myPhoto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

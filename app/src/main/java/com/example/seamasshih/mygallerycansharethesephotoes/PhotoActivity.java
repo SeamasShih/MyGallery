@@ -1,27 +1,20 @@
 package com.example.seamasshih.mygallerycansharethesephotoes;
 
-import android.Manifest;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.GestureDetector;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -30,12 +23,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.seamasshih.mygallerycansharethesephotoes.Data.MyPhotoData;
+import com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyPhotoView;
 
 import java.io.File;
 
@@ -43,7 +35,7 @@ public class PhotoActivity extends AppCompatActivity {
 
     ScaleGestureDetector scaleGestureDetector;
     RelativeLayout relativeLayout;
-    ImageView photo;
+    MyPhotoView photo;
     Toolbar toolbar;
     int photoOrder;
     int photoAmount;
@@ -54,6 +46,8 @@ public class PhotoActivity extends AppCompatActivity {
     ValueAnimator scaleAnimator;
     GestureDetector gestureDetector;
     boolean readyFinish = false;
+    boolean scaling = false;
+    boolean scrolling = false;
     ObjectAnimator photoAnimatorX;
     ObjectAnimator photoAnimatorY;
     AnimatorSet photoAnimatorSet;
@@ -151,6 +145,13 @@ public class PhotoActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_UP:
                         if (readyFinish)
                             doPhotoBackAnimation(0);
+                        else if (scrolling) {
+                            photo.animationToEdge();
+                            if (photo.getScalingX() < .5f) onBackPressed();
+                            else if (photo.getScalingX() < 1f) doPhotoBackAnimation(1);
+
+                            scrolling = false;
+                        }
                         break;
                 }
                 return false;
@@ -160,6 +161,7 @@ public class PhotoActivity extends AppCompatActivity {
         relativeLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                if (scaling || scrolling) return false;
                 photo.setBackgroundColor(Color.TRANSPARENT);
                 doPhotoBackAnimation(.5f);
                 readyFinish = true;
@@ -171,9 +173,10 @@ public class PhotoActivity extends AppCompatActivity {
 
 
     void doPhotoBackAnimation(float target){
-        float now = photo.getScaleX();
+        float now = photo.getScalingX();
         scaleAnimator.setFloatValues(now , target);
         scaleAnimator.start();
+        photo.backToNormalSite();
     }
 
 
@@ -194,8 +197,8 @@ public class PhotoActivity extends AppCompatActivity {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float t = (float) animation.getAnimatedValue();
-                photo.setScaleX(t);
-                photo.setScaleY(t);
+                photo.setScalingX(t);
+                photo.setScalingY(t);
                 if (t == 0)
                     finish();
             }
@@ -205,7 +208,8 @@ public class PhotoActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+//        super.onBackPressed();
+        photo.setBackgroundColor(Color.TRANSPARENT);
         doPhotoBackAnimation(0);
     }
 
@@ -237,6 +241,7 @@ public class PhotoActivity extends AppCompatActivity {
                     context.getContentResolver().delete(
                             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,MediaStore.Images.Media.DATA + "=?", strings
                     );
+                    photo.setBackgroundColor(Color.TRANSPARENT);
                     doPhotoBackAnimation(0);
                     finish();
                     break;
@@ -249,7 +254,8 @@ public class PhotoActivity extends AppCompatActivity {
         @Override
         public boolean onScaleBegin(ScaleGestureDetector detector) {
             if (scaleAnimator.isRunning()) return false;
-            scale = photo.getScaleX();
+            scale = photo.getScalingX();
+            scaling = true;
             return super.onScaleBegin(detector);
         }
 
@@ -257,8 +263,8 @@ public class PhotoActivity extends AppCompatActivity {
         public boolean onScale(ScaleGestureDetector detector) {
             float factor = Math.abs(detector.getScaleFactor());
 
-            photo.setScaleX(factor * scale);
-            photo.setScaleY(factor * scale);
+            photo.setScalingX(factor * scale);
+            photo.setScalingY(factor * scale);
 
             return super.onScale(detector);
         }
@@ -267,8 +273,9 @@ public class PhotoActivity extends AppCompatActivity {
         public void onScaleEnd(ScaleGestureDetector detector) {
             super.onScaleEnd(detector);
             float factor = Math.abs(detector.getScaleFactor());
+            scaling = false;
 
-            if (factor < .5f) finish();
+            if (factor < .5f) onBackPressed();
             else if (factor < 1f) doPhotoBackAnimation(1);
         }
     }
@@ -291,10 +298,13 @@ public class PhotoActivity extends AppCompatActivity {
 
         @Override
         public boolean onDoubleTapEvent(MotionEvent e) {
-            if (photo.getScaleX() > 1)
-                doPhotoBackAnimation(1);
-            else if (photo.getScaleX() == 1)
+            if (photo.getScalingX() == 1 && !scaleAnimator.isRunning()) {
                 doPhotoBackAnimation(2);
+            }
+            else if (photo.getScalingX() > 1 && !scaleAnimator.isRunning()) {
+                doPhotoBackAnimation(1);
+                photo.backToNormalSite();
+            }
             return false;
         }
 
@@ -314,6 +324,11 @@ public class PhotoActivity extends AppCompatActivity {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            if (photo.isScaling()) {
+                photo.setAccumulateTranslatingX(-distanceX);
+                photo.setAccumulateTranslatingY(-distanceY);
+                scrolling = true;
+            }
             return false;
         }
 
