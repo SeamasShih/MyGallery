@@ -21,6 +21,7 @@ import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -35,7 +36,6 @@ import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyAdapt
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyEdgeEffectFactory;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyItemDecoration;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyNestedScrollingView;
-import com.github.clans.fab.FloatingActionMenu;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,10 +48,12 @@ public class MainActivity extends AppCompatActivity{
     MyAdapter adapter;
     GridLayoutManager manager;
     ScaleGestureDetector detector;
+    GestureDetector gestureDetector;
     SharedPreferences sharedPreferences;
     MyContentObserver contentObserver;
     final String SHARED_PREFERENCE_NAME = "mSharePreference";
     final String SHARED_PREFERENCE_SPAN_COUNT = "mSpanCount";
+    boolean isFling = false;
 
     final int READ_REQUESTCODE = 5566;
 
@@ -133,6 +135,17 @@ public class MainActivity extends AppCompatActivity{
 
         recyclerView.addItemDecoration(new MyItemDecoration(this, LinearLayout.VERTICAL));
         recyclerView.addItemDecoration(new MyItemDecoration(this, LinearLayout.HORIZONTAL));
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (!recyclerView.canScrollVertically(-1)
+                        && !scrollingView.getIsAnimation() && dy < 0 && isFling){
+                    scrollingView.onFlingAnimation();
+                    isFling = false;
+                }
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
     }
 
 
@@ -167,6 +180,8 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        gestureDetector = new GestureDetector(this, new MyGestureDetectorListener());
+
         recyclerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -174,6 +189,7 @@ public class MainActivity extends AppCompatActivity{
                     detector.onTouchEvent(event);
                     return true;
                 }
+                gestureDetector.onTouchEvent(event);
                 return false;
             }
         });
@@ -283,6 +299,17 @@ public class MainActivity extends AppCompatActivity{
 
         return data;
     }
+
+
+    class MyGestureDetectorListener extends GestureDetector.SimpleOnGestureListener{
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            isFling = true;
+            return super.onFling(e1, e2, velocityX, velocityY);
+        }
+    }
+
+
 
     class MyMenuItemClickListener implements Toolbar.OnMenuItemClickListener{
 

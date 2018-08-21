@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -32,7 +33,7 @@ public class MyNestedScrollingView extends RelativeLayout implements NestedScrol
         bottomView = new View(context);
         bottomView.setVisibility(INVISIBLE);
         animator = new ValueAnimator();
-        animator.setInterpolator(new AccelerateInterpolator());
+        animator.setInterpolator(new DecelerateInterpolator());
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -44,6 +45,10 @@ public class MyNestedScrollingView extends RelativeLayout implements NestedScrol
                 }
             }
         });
+    }
+
+    public boolean getIsAnimation(){
+        return isAnimation;
     }
 
     public void setToolbarY(int toolbarY) {
@@ -59,6 +64,13 @@ public class MyNestedScrollingView extends RelativeLayout implements NestedScrol
     @Override
     public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
         return ((!child.canScrollVertically(-1)||!child.canScrollVertically(1)) && !isAnimation);
+    }
+
+    public void onFlingAnimation(){
+        isAnimation = true;
+        animator.setIntValues(0, -toolbarY*2/3 , 0);
+        animator.setDuration(400);
+        animator.start();
     }
 
     @Override
@@ -118,12 +130,5 @@ public class MyNestedScrollingView extends RelativeLayout implements NestedScrol
         animator.setIntValues(mDY, 0);
         animator.setDuration(time);
         animator.start();
-    }
-
-    @Override
-    public boolean onNestedPreFling(View target, float velocityX, float velocityY) {
-        if (!target.canScrollVertically(-1)) {
-        }
-        return false;
     }
 }
