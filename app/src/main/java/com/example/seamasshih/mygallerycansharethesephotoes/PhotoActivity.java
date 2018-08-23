@@ -14,6 +14,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -146,9 +147,12 @@ public class PhotoActivity extends AppCompatActivity {
                         if (readyFinish)
                             doPhotoBackAnimation(0);
                         else if (scrolling) {
-                            photo.animationToEdge();
-                            if (photo.getScalingX() < .5f) onBackPressed();
-                            else if (photo.getScalingX() < 1f) doPhotoBackAnimation(1);
+                            if (photo.getScaling() < .5f)
+                                onBackPressed();
+                            else if (photo.getScaling() < 1f)
+                                doPhotoBackAnimation(1);
+                            else
+                                photo.animationToEdge();
 
                             scrolling = false;
                         }
@@ -173,7 +177,7 @@ public class PhotoActivity extends AppCompatActivity {
 
 
     void doPhotoBackAnimation(float target){
-        float now = photo.getScalingX();
+        float now = photo.getScaling();
         scaleAnimator.setFloatValues(now , target);
         scaleAnimator.start();
         photo.backToNormalSite();
@@ -197,8 +201,7 @@ public class PhotoActivity extends AppCompatActivity {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float t = (float) animation.getAnimatedValue();
-                photo.setScalingX(t);
-                photo.setScalingY(t);
+                photo.setScaling(t);
                 if (t == 0)
                     finish();
             }
@@ -254,7 +257,7 @@ public class PhotoActivity extends AppCompatActivity {
         @Override
         public boolean onScaleBegin(ScaleGestureDetector detector) {
             if (scaleAnimator.isRunning()) return false;
-            scale = photo.getScalingX();
+            scale = photo.getScaling();
             scaling = true;
             return super.onScaleBegin(detector);
         }
@@ -262,9 +265,10 @@ public class PhotoActivity extends AppCompatActivity {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             float factor = Math.abs(detector.getScaleFactor());
+            float x = detector.getFocusX();
+            float y = detector.getFocusY();
 
-            photo.setScalingX(factor * scale);
-            photo.setScalingY(factor * scale);
+            photo.setScaling(factor * scale,x,y);
 
             return super.onScale(detector);
         }
@@ -298,10 +302,10 @@ public class PhotoActivity extends AppCompatActivity {
 
         @Override
         public boolean onDoubleTapEvent(MotionEvent e) {
-            if (photo.getScalingX() == 1 && !scaleAnimator.isRunning()) {
+            if (photo.getScaling() == 1 && !scaleAnimator.isRunning()) {
                 doPhotoBackAnimation(2);
             }
-            else if (photo.getScalingX() > 1 && !scaleAnimator.isRunning()) {
+            else if (photo.getScaling() > 1 && !scaleAnimator.isRunning()) {
                 doPhotoBackAnimation(1);
                 photo.backToNormalSite();
             }
@@ -324,7 +328,7 @@ public class PhotoActivity extends AppCompatActivity {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            if (photo.isScaling()) {
+            if (photo.isScaling() && !scaleAnimator.isRunning()) {
                 photo.setAccumulateTranslatingX(-distanceX);
                 photo.setAccumulateTranslatingY(-distanceY);
                 scrolling = true;

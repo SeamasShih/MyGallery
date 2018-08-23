@@ -263,6 +263,8 @@ public class MainActivity extends AppCompatActivity{
             case READ_REQUESTCODE:
                 if (grantResults[0] != PackageManager.PERMISSION_GRANTED)
                     finish();
+                else
+                    recreate();
         }
     }
 

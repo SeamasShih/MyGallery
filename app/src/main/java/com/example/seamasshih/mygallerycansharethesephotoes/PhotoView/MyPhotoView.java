@@ -6,6 +6,8 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -57,6 +59,7 @@ public class MyPhotoView extends android.support.v7.widget.AppCompatImageView {
                 float t = (float) animation.getAnimatedValue();
                 setTranslatingX(t);
                 translatingX = t;
+                Log.wtf("Seamas","x = " + translatingX);
                 postInvalidate();
             }
         });
@@ -85,29 +88,61 @@ public class MyPhotoView extends android.support.v7.widget.AppCompatImageView {
     AnimatorSet backToEdge;
     ValueAnimator edgeX;
     ValueAnimator edgeY;
+    Matrix matrix = new Matrix();
 
-    float scalingX = 1;
-    float scalingY = 1;
+    float scaling = 1;
     float translatingX = 0;
     float translatingY = 0;
+    float scaleCenterX;
+    float scaleCenterY;
 
-    public void setScalingX(float scalingX){
-        this.scalingX = scalingX;
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        initialScaleCenter();
+    }
+
+
+    private void initialScaleCenter(){
+        scaleCenterX = getWidth()/2;
+        scaleCenterY = getHeight()/2;
+    }
+
+
+    public boolean isBackingToEdge(){
+        return backToEdge.isRunning();
+    }
+
+
+    public void setScaling(float scaling , float px , float py){
+        this.scaling = scaling;
+
+        Matrix invert = new Matrix();
+
+        matrix.invert(invert);
+        float[] floats = new float[]{px,py,1};
+        invert.mapPoints(floats);
+        translatingX = px - floats[0];
+        translatingY = py - floats[1];
+        scaleCenterX = floats[0];
+        scaleCenterY = floats[1];
+        invalidate();
+    }
+
+    public void setScaling(float scaling){
+        this.scaling = scaling;
         invalidate();
     }
 
     public boolean isScaling(){
-        return scalingX != 1;
+        return scaling != 1;
     }
 
-    public float getScalingX() {
-        return scalingX;
+    public float getScaling() {
+        return scaling;
     }
 
-    public void setScalingY(float scalingY){
-        this.scalingY = scalingY;
-        invalidate();
-    }
 
 
     public void setTranslatingX(float translatingX){
@@ -152,20 +187,21 @@ public class MyPhotoView extends android.support.v7.widget.AppCompatImageView {
     public void animationToEdge(){
         if(!isTranslating()) return;
 
-        Matrix matrix = new Matrix();
-        matrix.postScale(scalingX,scalingY,getWidth()/2,getHeight()/2);
-        matrix.postTranslate(translatingX,translatingY);
+        float pl = getDrawable().getBounds().left + getWidth()/2 - getDrawable().getBounds().centerX();
+        float pt = getDrawable().getBounds().top + getHeight()/2 - getDrawable().getBounds().centerY();
+        float pr = getDrawable().getBounds().right + getWidth()/2 - getDrawable().getBounds().centerX();
+        float pb = getDrawable().getBounds().bottom + getHeight()/2 - getDrawable().getBounds().centerY();
 
         float[] pointLT = new float[]{
-                getDrawable().getBounds().left + getWidth()/2 - getDrawable().getBounds().centerX(),
-                getDrawable().getBounds().top + getHeight()/2 - getDrawable().getBounds().centerY() ,
+                pl,
+                pt,
                 1
         };
         matrix.mapPoints(pointLT);
 
         float[] pointRB = new float[]{
-                getDrawable().getBounds().right + getWidth()/2 - getDrawable().getBounds().centerX(),
-                getDrawable().getBounds().bottom + getHeight()/2 - getDrawable().getBounds().centerY() ,
+                pr,
+                pb,
                 1
         };
         matrix.mapPoints(pointRB);
@@ -178,19 +214,31 @@ public class MyPhotoView extends android.support.v7.widget.AppCompatImageView {
         edgeY.setFloatValues(translatingY,translatingY);
         boolean isAnimation = false;
         if (l > 0 && (r-l) > getWidth()) {
-            edgeX.setFloatValues(translatingX, translatingX - l);
+            float left = getLeft();
+            left += (scaling-1)*scaleCenterX;
+            left -= scaling*pl;
+            edgeX.setFloatValues(translatingX, left);
             isAnimation = true;
         }
         else if (r < getWidth() && (r-l) > getWidth()) {
-            edgeX.setFloatValues(translatingX, translatingX + getWidth() - r);
+            float right = getRight();
+            right += (scaling-1)*scaleCenterX;
+            right -= scaling*pr;
+            edgeX.setFloatValues(translatingX, right);
             isAnimation = true;
         }
         if (t > 0 && (b-t) > getHeight()) {
-            edgeY.setFloatValues(translatingY, translatingY - t);
+            float top = getTop();
+            top += (scaling-1)*scaleCenterY;
+            top -= scaling*pt;
+            edgeY.setFloatValues(translatingY, top);
             isAnimation = true;
         }
         else if (b < getHeight() && (b-t) > getHeight()) {
-            edgeY.setFloatValues(translatingY, translatingY + getHeight() - b);
+            float bottom = getBottom();
+            bottom += (scaling-1)*scaleCenterY;
+            bottom -= scaling*pb;
+            edgeY.setFloatValues(translatingY, bottom);
             isAnimation = true;
         }
 
@@ -200,8 +248,10 @@ public class MyPhotoView extends android.support.v7.widget.AppCompatImageView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.translate(translatingX,translatingY);
-        canvas.scale(scalingX,scalingY,getWidth()/2,getHeight()/2);
+        matrix.setTranslate(translatingX,translatingY);
+        matrix.preScale(scaling,scaling,scaleCenterX,scaleCenterY);
+        canvas.concat(matrix);
+        canvas.setMatrix(matrix);
         super.onDraw(canvas);
     }
 }
