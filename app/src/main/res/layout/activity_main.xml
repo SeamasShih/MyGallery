@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/transparent"
     android:id="@+id/relativeLayout">
 
     <com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyNestedScrollingView
@@ -11,6 +12,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:context=".MainActivity"
+        android:background="@android:color/transparent"
         android:id="@+id/scrollingLayout">
 
         <android.support.v7.widget.RecyclerView
