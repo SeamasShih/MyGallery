@@ -63,10 +63,19 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setTheme(R.style.MyTheme);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+        );
 
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            ActivityCompat.requestPermissions(MainActivity.this,new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},READ_REQUESTCODE);
+        if (ActivityCompat.checkSelfPermission(
+                MainActivity.this,
+                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(
+                    MainActivity.this,
+                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    READ_REQUESTCODE);
 
         findMyView();
 
@@ -115,7 +124,8 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void showToolbar(boolean show){
-        toolbar.setVisible(show);
+        if (!(show && toolbar.getVisibility() == View.VISIBLE))
+            toolbar.setVisible(show);
         if (!show){
             scrollingView.onStopNestedScroll(recyclerView);
         }
@@ -349,21 +359,15 @@ public class MainActivity extends AppCompatActivity{
                 case R.id.tool_delete:
                     ArrayList<MyPhotoData> deleteData = adapter.getPhotoData();
                     ArrayList<Integer> deletePick = adapter.getPick();
-//                    ArrayList<String> deleteList = new ArrayList<>();
 
                     for (int p : deletePick){
                         File file = new File(deleteData.get(p).getData());
-//                        deleteList.add(file.getPath());
                         String[] strings =new String[]{file.getPath()};
                         context.getContentResolver().delete(
                                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,MediaStore.Images.Media.DATA + "=?", strings
                         );
                     }
 
-//                    String[] strings = deleteList.toArray(new String[deleteList.size()]);
-//                    context.getContentResolver().delete(
-//                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,MediaStore.Images.Media.DATA + "=?", strings
-//                    );
                     showToolbar(false);
                     break;
             }
