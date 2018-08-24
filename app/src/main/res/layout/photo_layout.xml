@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:background="@android:color/black"/>
 
-    <android.support.v7.widget.Toolbar
+    <com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
@@ -20,6 +20,6 @@
         app:navigationIcon="?android:attr/homeAsUpIndicator"
         android:background="#22000000">
 
-    </android.support.v7.widget.Toolbar>
+    </com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyToolbar>
 
 </RelativeLayout>

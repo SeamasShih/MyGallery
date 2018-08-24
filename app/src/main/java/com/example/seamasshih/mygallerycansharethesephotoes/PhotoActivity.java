@@ -29,6 +29,7 @@ import android.widget.RelativeLayout;
 import com.bumptech.glide.Glide;
 import com.example.seamasshih.mygallerycansharethesephotoes.Data.MyPhotoData;
 import com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyPhotoView;
+import com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyToolbar;
 
 import java.io.File;
 
@@ -37,7 +38,7 @@ public class PhotoActivity extends AppCompatActivity {
     ScaleGestureDetector scaleGestureDetector;
     RelativeLayout relativeLayout;
     MyPhotoView photo;
-    Toolbar toolbar;
+    MyToolbar toolbar;
     int photoOrder;
     int photoAmount;
     MyPhotoData data;
@@ -165,7 +166,8 @@ public class PhotoActivity extends AppCompatActivity {
         relativeLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if (scaling || scrolling) return false;
+                if (scaling || scrolling ) return false;
+                toolbar.setVisible(false);
                 photo.setBackgroundColor(Color.TRANSPARENT);
                 doPhotoBackAnimation(.5f);
                 readyFinish = true;
@@ -289,9 +291,9 @@ public class PhotoActivity extends AppCompatActivity {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
             if (toolbar.getVisibility() == View.INVISIBLE)
-                toolbar.setVisibility(View.VISIBLE);
+                toolbar.setVisible(true);
             else
-                toolbar.setVisibility(View.INVISIBLE);
+                toolbar.setVisible(false);
             return false;
         }
 

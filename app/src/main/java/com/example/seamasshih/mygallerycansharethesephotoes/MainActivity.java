@@ -36,13 +36,14 @@ import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyAdapt
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyEdgeEffectFactory;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyItemDecoration;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyNestedScrollingView;
+import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyToolbar;
 
 import java.io.File;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity{
 
-    Toolbar toolbar;
+    MyToolbar toolbar;
     RecyclerView recyclerView;
     MyNestedScrollingView scrollingView;
     MyAdapter adapter;
@@ -114,7 +115,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void showToolbar(boolean show){
-        toolbar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        toolbar.setVisible(show);
         if (!show){
             scrollingView.onStopNestedScroll(recyclerView);
         }

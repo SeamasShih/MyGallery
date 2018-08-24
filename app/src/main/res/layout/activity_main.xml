@@ -23,7 +23,7 @@
 
     </com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyNestedScrollingView>
 
-    <android.support.v7.widget.Toolbar
+    <com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyToolbar
         android:id="@+id/tool"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
@@ -32,6 +32,6 @@
         app:navigationIcon="?android:attr/homeAsUpIndicator"
         android:background="#70000000">
 
-    </android.support.v7.widget.Toolbar>
+    </com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyToolbar>
 
 </RelativeLayout>
