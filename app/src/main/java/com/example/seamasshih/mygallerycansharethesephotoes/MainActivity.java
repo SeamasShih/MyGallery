@@ -32,6 +32,7 @@ import android.view.animation.LayoutAnimationController;
 import android.widget.LinearLayout;
 
 import com.example.seamasshih.mygallerycansharethesephotoes.Data.MyPhotoData;
+import com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyDrawable;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyAdapter;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyEdgeEffectFactory;
 import com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyItemDecoration;
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity{
                 onBackPressed();
             }
         });
+        toolbar.setNavigationIcon(MyDrawable.createCloseDownIcon());
         toolbar.setOnMenuItemClickListener(new MyMenuItemClickListener(this));
     }
 

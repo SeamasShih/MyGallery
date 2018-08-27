@@ -28,6 +28,7 @@ import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.seamasshih.mygallerycansharethesephotoes.Data.MyPhotoData;
+import com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyDrawable;
 import com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyPhotoView;
 import com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyToolbar;
 
@@ -111,6 +112,7 @@ public class PhotoActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+        toolbar.setNavigationIcon(MyDrawable.createCloseUpIcon());
         toolbar.setOnMenuItemClickListener(new MyMenuItemClickListener(this));
     }
 

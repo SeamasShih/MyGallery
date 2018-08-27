@@ -29,7 +29,6 @@
         android:layout_height="?android:attr/actionBarSize"
         android:layout_alignParentBottom="true"
         app:titleTextColor="@android:color/white"
-        app:navigationIcon="?android:attr/homeAsUpIndicator"
         android:background="#70000000">
 
     </com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyToolbar>

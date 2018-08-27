@@ -17,7 +17,6 @@
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
         app:titleTextColor="@android:color/white"
-        app:navigationIcon="?android:attr/homeAsUpIndicator"
         android:background="#22000000">
 
     </com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyToolbar>
