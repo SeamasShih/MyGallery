@@ -214,6 +214,10 @@ public class PhotoActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 //        super.onBackPressed();
+        if (toolbar.getVisibility() == View.VISIBLE){
+            toolbar.setVisible(false);
+            return;
+        }
         photo.setBackgroundColor(Color.TRANSPARENT);
         doPhotoBackAnimation(0);
     }
