@@ -8,5 +8,6 @@
         android:id="@+id/item_iv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center" />
+        android:gravity="center"
+        android:transitionName="name"/>
 </com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView.MyLinearLayout>

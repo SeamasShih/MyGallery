@@ -1,6 +1,7 @@
 package com.example.seamasshih.mygallerycansharethesephotoes.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -83,7 +84,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                     intent.setClass(context, PhotoActivity.class);
                     intent.putExtra("photoOrder",position+1);
                     intent.putExtra("photoAmount",getItemCount());
-                    intent.putExtra("photoData",mData.get(position));
+                    intent.putParcelableArrayListExtra("photoData",mData);
                     context.startActivity(intent);
                 }
                 else {

@@ -10,6 +10,7 @@
         android:id="@+id/myPhoto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:transitionName="name"
         android:background="@android:color/black"/>
 
     <com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyToolbar
@@ -17,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
         app:titleTextColor="@android:color/white"
+        app:navigationIcon="?attr/homeAsUpIndicator"
         android:background="#22000000">
 
     </com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyToolbar>

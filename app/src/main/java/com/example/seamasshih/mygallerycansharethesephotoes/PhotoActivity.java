@@ -33,15 +33,18 @@ import com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyPhotoVie
 import com.example.seamasshih.mygallerycansharethesephotoes.PhotoView.MyToolbar;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class PhotoActivity extends AppCompatActivity {
 
+    final String TAG = "PhotoActivity";
     ScaleGestureDetector scaleGestureDetector;
     RelativeLayout relativeLayout;
     MyPhotoView photo;
     MyToolbar toolbar;
     int photoOrder;
     int photoAmount;
+    ArrayList<MyPhotoData> myPhotoData;
     MyPhotoData data;
     String uri;
     String mimeType;
@@ -92,10 +95,11 @@ public class PhotoActivity extends AppCompatActivity {
 
     void setToolbar(){
         Intent intent = getIntent();
-        data = intent.getParcelableExtra("photoData");
-        uri = data.getData();
+        myPhotoData = intent.getParcelableArrayListExtra("photoData");
         photoOrder = intent.getIntExtra("photoOrder",-1);
         photoAmount = intent.getIntExtra("photoAmount",-1);
+        data = myPhotoData.get(photoOrder-1);
+        uri = data.getData();
 
         Glide.with(this)
                 .load(uri)
@@ -109,10 +113,11 @@ public class PhotoActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                toolbar.setVisible(false);
+                photo.setBackgroundColor(Color.TRANSPARENT);
+                doPhotoBackAnimation(0);
             }
         });
-        toolbar.setNavigationIcon(MyDrawable.createCloseUpIcon());
         toolbar.setOnMenuItemClickListener(new MyMenuItemClickListener(this));
     }
 
@@ -158,6 +163,27 @@ public class PhotoActivity extends AppCompatActivity {
                                 photo.animationToEdge();
 
                             scrolling = false;
+                        }
+                        else if (event.getPointerCount() == 1 && !photo.isScaling()){
+                            float x = event.getX();
+                            if (x > dX+100 && photoOrder > 1){
+                                photoOrder--;
+                                data = myPhotoData.get(photoOrder-1);
+                                uri = data.getData();
+                                Glide.with(v.getContext())
+                                        .load(uri)
+                                        .into(photo);
+                                toolbar.setTitle(photoOrder + "/" + photoAmount);
+                            }
+                            else if (x < dX-100 && photoOrder < photoAmount){
+                                photoOrder++;
+                                data = myPhotoData.get(photoOrder-1);
+                                uri = data.getData();
+                                Glide.with(v.getContext())
+                                        .load(uri)
+                                        .into(photo);
+                                toolbar.setTitle(photoOrder + "/" + photoAmount);
+                            }
                         }
                         break;
                 }
